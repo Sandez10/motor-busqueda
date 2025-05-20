@@ -7,73 +7,110 @@
     <link rel="stylesheet" href="formulario.css"> 
 </head>
 <body>
-    <h1>ThunderBiker</h1>
-    
-    <div class="search-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre o grupo..." autofocus>
-    </div>
-    
-    <div class="results-container">
-        <div id="resultsList"></div>
+    <div class="container">
+        <header>
+            <h1>Búsqueda de Empleados</h1>
+            <p class="subtitle">Encuentra a tus colegas fácilmente</p>
+        </header>
+
+        <div class="search-container">
+            <div class="search-input-container">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Buscar por nombre, departamento o cargo..." 
+                    autofocus
+                >
+                <button class="clear-btn" id="clearSearch">✕</button>
+            </div>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">Cargando...</div>
+                <div class="sort-options">
+                    <button class="sort-btn" data-sort="name">Nombre</button>
+                    <button class="sort-btn active" data-sort="department">Departamento</button>
+                </div>
+            </div>
+            
+            <ul class="results-list" id="resultsList">
+                <!-- Los resultados se cargarán aquí -->
+            </ul>
+        </div>
+
         <div class="pagination" id="pagination"></div>
     </div>
-    
+
     <!-- Modal de detalles -->
     <div class="modal" id="detailModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Detalles</h2>
+                <h2 class="modal-title">Detalles del empleado</h2>
                 <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-body" id="modalBody">
+                <!-- El contenido del modal se cargará aquí -->
+            </div>
         </div>
     </div>
 
     <script>
         // Datos de ejemplo
-        const personas = [
-            {id: 1, nombre: 'María García', grupo: 'Ventas', email: 'maria@ejemplo.com', telefono: '555-1001', cargo: 'Ejecutiva de Ventas'},
-            {id: 2, nombre: 'Juan Pérez', grupo: 'TI', email: 'juan@ejemplo.com', telefono: '555-1002', cargo: 'Desarrollador Senior'},
-            {id: 3, nombre: 'Ana López', grupo: 'Marketing', email: 'ana@ejemplo.com', telefono: '555-1003', cargo: 'Directora de Marketing'},
-            {id: 4, nombre: 'Carlos Sánchez', grupo: 'Ventas', email: 'carlos@ejemplo.com', telefono: '555-1004', cargo: 'Gerente de Ventas'},
-            {id: 5, nombre: 'Luisa Fernández', grupo: 'RH', email: 'luisa@ejemplo.com', telefono: '555-1005', cargo: 'Recursos Humanos'},
-            {id: 6, nombre: 'Pedro Martínez', grupo: 'TI', email: 'pedro@ejemplo.com', telefono: '555-1006', cargo: 'Desarrollador Frontend'},
-            {id: 7, nombre: 'Sofía Ramírez', grupo: 'Marketing', email: 'sofia@ejemplo.com', telefono: '555-1007', cargo: 'Especialista en SEO'},
-            {id: 8, nombre: 'Diego González', grupo: 'Ventas', email: 'diego@ejemplo.com', telefono: '555-1008', cargo: 'Asesor Comercial'},
-            {id: 9, nombre: 'Elena Castro', grupo: 'Administración', email: 'elena@ejemplo.com', telefono: '555-1009', cargo: 'Asistente Administrativa'},
-            {id: 10, nombre: 'Jorge Ruiz', grupo: 'TI', email: 'jorge@ejemplo.com', telefono: '555-1010', cargo: 'Desarrollador Backend'},
-            {id: 11, nombre: 'Laura Mendoza', grupo: 'Ventas', email: 'laura@ejemplo.com', telefono: '555-1011', cargo: 'Ejecutiva de Cuentas'},
-            {id: 12, nombre: 'Ricardo Vargas', grupo: 'TI', email: 'ricardo@ejemplo.com', telefono: '555-1012', cargo: 'Arquitecto de Software'},
-            {id: 13, nombre: 'Patricia Silva', grupo: 'Marketing', email: 'patricia@ejemplo.com', telefono: '555-1013', cargo: 'Directora de Contenidos'},
-            {id: 14, nombre: 'Fernando Rojas', grupo: 'Ventas', email: 'fernando@ejemplo.com', telefono: '555-1014', cargo: 'Gerente Regional'},
-            {id: 15, nombre: 'Gabriela Torres', grupo: 'RH', email: 'gabriela@ejemplo.com', telefono: '555-1015', cargo: 'Reclutadora'}
+        const empleados = [
+            {id: 1, nombre: 'María García', departamento: 'Ventas', cargo: 'Ejecutiva de Ventas', email: 'maria.garcia@empresa.com', telefono: '+34 555 100 201', ubicacion: 'Oficina Central, Piso 3', fechaIngreso: '15/05/2018', proyectos: 12, habilidades: ['CRM', 'Negociación', 'Ventas B2B']},
+            {id: 2, nombre: 'Juan Pérez', departamento: 'TI', cargo: 'Desarrollador Senior', email: 'juan.perez@empresa.com', telefono: '+34 555 100 202', ubicacion: 'Edificio Tecnológico, Piso 2', fechaIngreso: '22/11/2019', proyectos: 8, habilidades: ['JavaScript', 'React', 'Node.js']},
+            {id: 3, nombre: 'Ana López', departamento: 'Marketing', cargo: 'Directora de Marketing', email: 'ana.lopez@empresa.com', telefono: '+34 555 100 203', ubicacion: 'Oficina Central, Piso 4', fechaIngreso: '10/03/2017', proyectos: 15, habilidades: ['Estrategia', 'Redes Sociales', 'Branding']},
+            {id: 4, nombre: 'Carlos Sánchez', departamento: 'Ventas', cargo: 'Gerente de Ventas', email: 'carlos.sanchez@empresa.com', telefono: '+34 555 100 204', ubicacion: 'Oficina Central, Piso 3', fechaIngreso: '05/07/2016', proyectos: 22, habilidades: ['Liderazgo', 'Planificación', 'Análisis de Mercado']},
+            {id: 5, nombre: 'Luisa Fernández', departamento: 'RH', cargo: 'Recursos Humanos', email: 'luisa.fernandez@empresa.com', telefono: '+34 555 100 205', ubicacion: 'Oficina Central, Piso 1', fechaIngreso: '18/01/2020', proyectos: 5, habilidades: ['Reclutamiento', 'Capacitación', 'Relaciones Laborales']},
+            {id: 6, nombre: 'Pedro Martínez', departamento: 'TI', cargo: 'Desarrollador Frontend', email: 'pedro.martinez@empresa.com', telefono: '+34 555 100 206', ubicacion: 'Edificio Tecnológico, Piso 2', fechaIngreso: '30/09/2020', proyectos: 6, habilidades: ['Vue.js', 'CSS', 'UX/UI']},
+            {id: 7, nombre: 'Sofía Ramírez', departamento: 'Marketing', cargo: 'Especialista en SEO', email: 'sofia.ramirez@empresa.com', telefono: '+34 555 100 207', ubicacion: 'Oficina Central, Piso 4', fechaIngreso: '12/04/2019', proyectos: 9, habilidades: ['SEO', 'Analítica Web', 'Contenidos']},
+            {id: 8, nombre: 'Diego González', departamento: 'Ventas', cargo: 'Asesor Comercial', email: 'diego.gonzalez@empresa.com', telefono: '+34 555 100 208', ubicacion: 'Oficina Norte', fechaIngreso: '08/11/2021', proyectos: 4, habilidades: ['Atención al Cliente', 'CRM', 'Presentaciones']},
+            {id: 9, nombre: 'Elena Castro', departamento: 'Administración', cargo: 'Asistente Administrativa', email: 'elena.castro@empresa.com', telefono: '+34 555 100 209', ubicacion: 'Oficina Central, Piso 1', fechaIngreso: '25/02/2018', proyectos: 3, habilidades: ['Organización', 'Contabilidad', 'Atención al Detalle']},
+            {id: 10, nombre: 'Jorge Ruiz', departamento: 'TI', cargo: 'Desarrollador Backend', email: 'jorge.ruiz@empresa.com', telefono: '+34 555 100 210', ubicacion: 'Edificio Tecnológico, Piso 2', fechaIngreso: '14/07/2020', proyectos: 7, habilidades: ['Python', 'Django', 'APIs']},
+            {id: 11, nombre: 'Laura Mendoza', departamento: 'Ventas', cargo: 'Ejecutiva de Cuentas', email: 'laura.mendoza@empresa.com', telefono: '+34 555 100 211', ubicacion: 'Oficina Sur', fechaIngreso: '03/05/2021', proyectos: 5, habilidades: ['Relaciones con Clientes', 'CRM', 'Negociación']},
+            {id: 12, nombre: 'Ricardo Vargas', departamento: 'TI', cargo: 'Arquitecto de Software', email: 'ricardo.vargas@empresa.com', telefono: '+34 555 100 212', ubicacion: 'Edificio Tecnológico, Piso 3', fechaIngreso: '19/08/2017', proyectos: 11, habilidades: ['Arquitectura', 'Microservicios', 'Cloud']},
+            {id: 13, nombre: 'Patricia Silva', departamento: 'Marketing', cargo: 'Directora de Contenidos', email: 'patricia.silva@empresa.com', telefono: '+34 555 100 213', ubicacion: 'Oficina Central, Piso 4', fechaIngreso: '27/10/2018', proyectos: 13, habilidades: ['Redacción', 'Estrategia de Contenidos', 'Storytelling']},
+            {id: 14, nombre: 'Fernando Rojas', departamento: 'Ventas', cargo: 'Gerente Regional', email: 'fernando.rojas@empresa.com', telefono: '+34 555 100 214', ubicacion: 'Oficina Norte', fechaIngreso: '09/12/2015', proyectos: 18, habilidades: ['Liderazgo', 'Planificación Estratégica', 'Análisis de Datos']},
+            {id: 15, nombre: 'Gabriela Torres', departamento: 'RH', cargo: 'Reclutadora', email: 'gabriela.torres@empresa.com', telefono: '+34 555 100 215', ubicacion: 'Oficina Central, Piso 1', fechaIngreso: '22/03/2019', proyectos: 6, habilidades: ['Reclutamiento', 'Entrevistas', 'Onboarding']}
         ];
 
         // Configuración
         const resultadosPorPagina = 5;
         let paginaActual = 1;
         let terminoBusqueda = '';
+        let ordenActual = 'department';
         let resultadosFiltrados = [];
+        let timeoutBusqueda = null;
 
         // Elementos del DOM
         const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsCount = document.getElementById('resultsCount');
         const resultsList = document.getElementById('resultsList');
         const pagination = document.getElementById('pagination');
+        const sortButtons = document.querySelectorAll('.sort-btn');
         const detailModal = document.getElementById('detailModal');
         const modalBody = document.getElementById('modalBody');
         const closeModal = document.getElementById('closeModal');
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
-            buscar();
+            // Mostrar skeleton loading inicial
+            mostrarSkeletonLoading();
             
-            // Eventos
-            searchInput.addEventListener('input', () => {
-                terminoBusqueda = searchInput.value.trim();
-                paginaActual = 1;
+            // Simular carga inicial
+            setTimeout(() => {
                 buscar();
-            });
+            }, 800);
             
+            // Event listeners
+            searchInput.addEventListener('input', manejarBusqueda);
+            clearSearch.addEventListener('click', limpiarBusqueda);
+            sortButtons.forEach(btn => btn.addEventListener('click', cambiarOrden));
             closeModal.addEventListener('click', cerrarModal);
             
             // Cerrar modal con tecla ESC
@@ -91,18 +128,120 @@
             });
         });
 
-        // Función de búsqueda
-        function buscar() {
+        // Manejar búsqueda con debounce
+        function manejarBusqueda() {
+            terminoBusqueda = searchInput.value.trim();
+            
+            // Mostrar/ocultar botón de limpiar
             if (terminoBusqueda) {
-                resultadosFiltrados = personas.filter(persona => 
-                    persona.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase()) || 
-                    persona.grupo.toLowerCase().includes(terminoBusqueda.toLowerCase())
-                );
+                clearSearch.style.opacity = '1';
+                clearSearch.style.pointerEvents = 'all';
             } else {
-                resultadosFiltrados = [...personas];
+                clearSearch.style.opacity = '0';
+                clearSearch.style.pointerEvents = 'none';
             }
             
+            // Cancelar el timeout anterior si existe
+            if (timeoutBusqueda) {
+                clearTimeout(timeoutBusqueda);
+            }
+            
+            // Mostrar skeleton loading durante la búsqueda
+            mostrarSkeletonLoading();
+            
+            // Debounce para evitar múltiples búsquedas rápidas
+            timeoutBusqueda = setTimeout(() => {
+                paginaActual = 1;
+                buscar();
+            }, 300);
+        }
+
+        // Limpiar búsqueda
+        function limpiarBusqueda() {
+            searchInput.value = '';
+            terminoBusqueda = '';
+            clearSearch.style.opacity = '0';
+            clearSearch.style.pointerEvents = 'none';
+            paginaActual = 1;
+            mostrarSkeletonLoading();
+            
+            setTimeout(() => {
+                buscar();
+            }, 300);
+            
+            searchInput.focus();
+        }
+
+        // Función de búsqueda principal
+        function buscar() {
+            if (terminoBusqueda) {
+                const termino = terminoBusqueda.toLowerCase();
+                resultadosFiltrados = empleados.filter(empleado => 
+                    empleado.nombre.toLowerCase().includes(termino) || 
+                    empleado.departamento.toLowerCase().includes(termino) ||
+                    empleado.cargo.toLowerCase().includes(termino)
+                );
+            } else {
+                resultadosFiltrados = [...empleados];
+            }
+            
+            // Ordenar resultados
+            ordenarResultados();
+            
             mostrarResultados();
+        }
+
+        // Ordenar resultados
+        function ordenarResultados() {
+            if (ordenActual === 'name') {
+                resultadosFiltrados.sort((a, b) => a.nombre.localeCompare(b.nombre));
+            } else {
+                resultadosFiltrados.sort((a, b) => {
+                    if (a.departamento === b.departamento) {
+                        return a.nombre.localeCompare(b.nombre);
+                    }
+                    return a.departamento.localeCompare(b.departamento);
+                });
+            }
+        }
+
+        // Cambiar criterio de ordenación
+        function cambiarOrden(e) {
+            const nuevoOrden = e.target.dataset.sort;
+            
+            if (nuevoOrden !== ordenActual) {
+                ordenActual = nuevoOrden;
+                
+                // Actualizar botones activos
+                sortButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.sort === nuevoOrden);
+                });
+                
+                ordenarResultados();
+                mostrarResultados();
+            }
+        }
+
+        // Mostrar skeleton loading
+        function mostrarSkeletonLoading() {
+            let html = '';
+            
+            for (let i = 0; i < resultadosPorPagina; i++) {
+                html += `
+                    <li class="result-item">
+                        <div class="skeleton skeleton-avatar"></div>
+                        <div class="result-content">
+                            <div class="skeleton skeleton-text" style="width: 70%"></div>
+                            <div class="skeleton skeleton-text" style="width: 50%"></div>
+                            <div class="skeleton skeleton-text" style="width: 60%"></div>
+                        </div>
+                    </li>
+                `;
+            }
+            
+            resultsList.innerHTML = html;
+            resultsCount.textContent = 'Buscando...';
+            pagination.innerHTML = '';
         }
 
         // Mostrar resultados
@@ -115,16 +254,37 @@
             // Mostrar lista de resultados
             if (resultadosPagina.length > 0) {
                 let html = '';
-                resultadosPagina.forEach(persona => {
+                resultadosPagina.forEach(empleado => {
+                    const iniciales = empleado.nombre.split(' ').map(n => n[0]).join('');
+                    
                     html += `
-                        <div class="result-item" data-id="${persona.id}">
-                            <div class="result-name">${persona.nombre}</div>
-                            <div class="result-group">${persona.grupo}</div>
-                            <div class="result-contact">${persona.email}</div>
-                        </div>
+                        <li class="result-item" data-id="${empleado.id}">
+                            <div class="result-avatar">${iniciales}</div>
+                            <div class="result-content">
+                                <div class="result-name">${empleado.nombre}</div>
+                                <div class="result-meta">
+                                    <div class="result-group">${empleado.departamento}</div>
+                                    <div class="result-position">${empleado.cargo}</div>
+                                </div>
+                                <div class="result-contact">
+                                    <div class="contact-item">
+                                        <span class="contact-icon">✉️</span>
+                                        <span>${empleado.email}</span>
+                                    </div>
+                                    <div class="contact-item">
+                                        <span class="contact-icon">📞</span>
+                                        <span>${empleado.telefono}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
                     `;
                 });
                 resultsList.innerHTML = html;
+                
+                // Mostrar contador de resultados
+                const total = resultadosFiltrados.length;
+                resultsCount.textContent = total === 1 ? '1 resultado encontrado' : `${total} resultados encontrados`;
                 
                 // Agregar eventos a los items
                 document.querySelectorAll('.result-item').forEach(item => {
@@ -134,7 +294,14 @@
                     });
                 });
             } else {
-                resultsList.innerHTML = '<div class="no-results">No se encontraron resultados</div>';
+                resultsList.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🔍</div>
+                        <p>No se encontraron resultados para "${terminoBusqueda}"</p>
+                        <p>Intenta con otros términos de búsqueda</p>
+                    </div>
+                `;
+                resultsCount.textContent = '0 resultados encontrados';
             }
             
             // Mostrar paginación
@@ -160,9 +327,9 @@
             
             // Botón Anterior
             if (paginaActual > 1) {
-                html += `<button class="page-btn" onclick="cambiarPagina(${paginaActual - 1})">Anterior</button>`;
+                html += `<button class="page-btn" onclick="cambiarPagina(${paginaActual - 1})">« Anterior</button>`;
             } else {
-                html += `<button class="page-btn disabled">Anterior</button>`;
+                html += `<button class="page-btn disabled">« Anterior</button>`;
             }
             
             // Primera página
@@ -188,9 +355,9 @@
             
             // Botón Siguiente
             if (paginaActual < totalPaginas) {
-                html += `<button class="page-btn" onclick="cambiarPagina(${paginaActual + 1})">Siguiente</button>`;
+                html += `<button class="page-btn" onclick="cambiarPagina(${paginaActual + 1})">Siguiente »</button>`;
             } else {
-                html += `<button class="page-btn disabled">Siguiente</button>`;
+                html += `<button class="page-btn disabled">Siguiente »</button>`;
             }
             
             pagination.innerHTML = html;
@@ -200,39 +367,69 @@
         function cambiarPagina(pagina) {
             paginaActual = pagina;
             mostrarResultados();
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            window.scrollTo({top: resultsContainer.offsetTop - 20, behavior: 'smooth'});
         }
 
         // Mostrar detalles en modal
         function mostrarDetalles(id) {
-            const persona = personas.find(p => p.id === id);
-            if (persona) {
+            const empleado = empleados.find(e => e.id === id);
+            if (empleado) {
+                const iniciales = empleado.nombre.split(' ').map(n => n[0]).join('');
+                
                 modalBody.innerHTML = `
-                    <div class="detail-row">
-                        <div class="detail-label">Nombre:</div>
-                        <div class="detail-value">${persona.nombre}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Grupo:</div>
-                        <div class="detail-value">${persona.grupo}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Cargo:</div>
-                        <div class="detail-value">${persona.cargo}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Email:</div>
-                        <div class="detail-value">
-                            <a href="mailto:${persona.email}">${persona.email}</a>
+                    <div class="profile-header">
+                        <div class="profile-avatar">${iniciales}</div>
+                        <div class="profile-info">
+                            <h3 class="profile-name">${empleado.nombre}</h3>
+                            <div class="profile-position">${empleado.cargo}</div>
+                            <div class="profile-department">${empleado.departamento}</div>
                         </div>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Teléfono:</div>
-                        <div class="detail-value">
-                            <a href="tel:${persona.telefono.replace(/-/g, '')}">${persona.telefono}</a>
+                    
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <div class="detail-title">Información de Contacto</div>
+                            <div class="detail-content">
+                                <a href="mailto:${empleado.email}" class="contact-link">
+                                    <span class="contact-icon">✉️</span>
+                                    <span>${empleado.email}</span>
+                                </a>
+                                <a href="tel:${empleado.telefono.replace(/[^0-9+]/g, '')}" class="contact-link">
+                                    <span class="contact-icon">📞</span>
+                                    <span>${empleado.telefono}</span>
+                                </a>
+                                <div class="contact-link">
+                                    <span class="contact-icon">🏢</span>
+                                    <span>${empleado.ubicacion}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <div class="detail-title">Información Laboral</div>
+                            <div class="detail-content">
+                                <div class="contact-link">
+                                    <span class="contact-icon">📅</span>
+                                    <span>Fecha de ingreso: ${empleado.fechaIngreso}</span>
+                                </div>
+                                <div class="contact-link">
+                                    <span class="contact-icon">📊</span>
+                                    <span>Proyectos completados: ${empleado.proyectos}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <div class="detail-title">Habilidades Principales</div>
+                            <div class="detail-content">
+                                ${empleado.habilidades.map(habilidad => 
+                                    `<span style="display: inline-block; background: #e9ecef; padding: 5px 10px; border-radius: 20px; margin: 0 5px 5px 0; font-size: 0.8rem;">${habilidad}</span>`
+                                ).join('')}
+                            </div>
                         </div>
                     </div>
                 `;
+                
                 detailModal.classList.add('show');
                 document.body.style.overflow = 'hidden';
             }
@@ -243,6 +440,9 @@
             detailModal.classList.remove('show');
             document.body.style.overflow = 'auto';
         }
+
+        // Hacer funciones accesibles globalmente para los eventos onclick
+        window.cambiarPagina = cambiarPagina;
     </script>
 </body>
 </html>
